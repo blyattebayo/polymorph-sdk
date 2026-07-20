@@ -7,14 +7,14 @@ declare(strict_types=1);
  * контракт Repository против in-memory фейка (зерно contract-kit).
  * Запуск: php be/sdk-v2/tests/smoke_data.php   (выход 0 = ок, 1 = провал)
  */
-
 spl_autoload_register(static function (string $class): void {
-    foreach (['Polymorph\\Sdk\\Tests\\' => __DIR__ . '/', 'Polymorph\\Sdk\\' => __DIR__ . '/../src/'] as $prefix => $base) {
+    foreach (['Polymorph\\Sdk\\Tests\\' => __DIR__.'/', 'Polymorph\\Sdk\\' => __DIR__.'/../src/'] as $prefix => $base) {
         if (str_starts_with($class, $prefix)) {
-            $path = $base . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+            $path = $base.str_replace('\\', '/', substr($class, strlen($prefix))).'.php';
             if (is_file($path)) {
                 require $path;
             }
+
             return;
         }
     }
@@ -34,7 +34,7 @@ function check(string $name, bool $ok): void
 {
     global $failures, $count;
     $count++;
-    if (!$ok) {
+    if (! $ok) {
         $failures[] = $name;
         fwrite(STDERR, "FAIL: {$name}\n");
     }
@@ -44,8 +44,9 @@ function throws(callable $fn, ?string $class = null): bool
 {
     try {
         $fn();
+
         return false;
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return $class === null || $e instanceof $class;
     }
 }
@@ -89,7 +90,7 @@ $repo = freshRepo($spec);
 
 // create / required / unique
 check('create assigns id+revision', $repo->find(1)?->id === 1 && $repo->find(1)?->revision === 1);
-check('create missing required throws', throws(static fn () => (new InMemoryRepository($spec))->create(['transport' => 'http']), \InvalidArgumentException::class));
+check('create missing required throws', throws(static fn () => (new InMemoryRepository($spec))->create(['transport' => 'http']), InvalidArgumentException::class));
 check('duplicate unique throws', throws(static fn () => $repo->create(['code' => 'alpha', 'transport' => 'http']), UniqueViolation::class));
 
 // update merges + bumps revision
@@ -112,7 +113,7 @@ check('first by code', $repo->query()->where('code', 'alpha')->first()?->id === 
 // aggregates (note: beta updated to 7 -> 5+7+9 = 21)
 check('sum attempts', $repo->query()->sum('attempts') === 21.0);
 check('avg attempts', abs(($repo->query()->avg('attempts') ?? 0) - 7.0) < 1e-9);
-check('aggregate non-numeric throws', throws(static fn () => $repo->query()->sum('code'), \InvalidArgumentException::class));
+check('aggregate non-numeric throws', throws(static fn () => $repo->query()->sum('code'), InvalidArgumentException::class));
 
 // pagination
 $p1 = $repo->query()->paginate(1, 2);
@@ -123,7 +124,7 @@ check('paginate page2 last', $repo->query()->paginate(2, 2)->pagination->hasMore
 // increment
 $inc = $repo->increment(1, 'attempts', 3);
 check('increment numeric', $inc->int('attempts') === 8 && $inc->revision === 2);
-check('increment non-numeric throws', throws(static fn () => $repo->increment(1, 'is_enabled', 1), \InvalidArgumentException::class));
+check('increment non-numeric throws', throws(static fn () => $repo->increment(1, 'is_enabled', 1), InvalidArgumentException::class));
 
 // firstOrCreate / upsert
 $repo2 = freshRepo($spec);
@@ -150,7 +151,7 @@ check('entity authorId', $e->authorId === 7);
 
 echo "Ran {$count} checks.\n";
 if ($failures !== []) {
-    echo count($failures) . " FAILED.\n";
+    echo count($failures)." FAILED.\n";
     exit(1);
 }
 echo "All passed.\n";

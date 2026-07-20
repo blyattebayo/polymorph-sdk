@@ -13,7 +13,9 @@ use Polymorph\Sdk\Access\Capability;
 final class Middleware
 {
     public const API = 'api';
+
     public const WEB = 'web';
+
     public const JWT_AUTH = 'auth:api';
 
     /** Алиас middleware проверки capability. */
@@ -22,18 +24,16 @@ final class Middleware
     /** Нейтральный символ CSRF-middleware API (хост резолвит его в свой FQCN при загрузке маршрутов). */
     public const CSRF = 'csrf';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function requireCapability(Capability $capability): string
     {
-        return self::CAPABILITY_ALIAS . ':' . $capability->resource . ',' . $capability->action;
+        return self::CAPABILITY_ALIAS.':'.$capability->resource.','.$capability->action;
     }
 
     public static function without(string $middleware): string
     {
-        return 'without:' . $middleware;
+        return 'without:'.$middleware;
     }
 
     public static function withoutCsrf(): string

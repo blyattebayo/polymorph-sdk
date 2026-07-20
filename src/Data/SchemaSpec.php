@@ -12,13 +12,12 @@ namespace Polymorph\Sdk\Data;
 final class SchemaSpec
 {
     /**
-     * @param list<FieldDefinition> $fields
+     * @param  list<FieldDefinition>  $fields
      */
     public function __construct(
         public readonly string $name,
         public readonly array $fields,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{name: string, fields: list<array<string, mixed>>}

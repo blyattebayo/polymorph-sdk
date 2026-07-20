@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Polymorph\Sdk\Codegen;
 
 use Polymorph\Sdk\Data\Cardinality;
+use Polymorph\Sdk\Data\Entity;
 use Polymorph\Sdk\Data\FieldDefinition;
 use Polymorph\Sdk\Data\FieldType;
 use Polymorph\Sdk\Data\SchemaSpec;
@@ -13,7 +14,7 @@ use Polymorph\Sdk\Data\SchemaSpec;
  * EXPERIMENTAL (не подключён в сборку плагинов — см. ADR 0003, P2).
  *
  * Генерирует типизированный класс-сущность из {@see SchemaSpec}: подкласс
- * {@see \Polymorph\Sdk\Data\Entity} с типизированными аксессорами на каждое поле.
+ * {@see Entity} с типизированными аксессорами на каждое поле.
  *
  * Это убирает `array<string,mixed>` из кода расширения: вместо
  * `$record->get('attempts')` (mixed) — `$server->attempts()` (int).

@@ -17,14 +17,13 @@ final class RouteDefinition
     private array $middleware = [];
 
     /**
-     * @param list<string> $methods
+     * @param  list<string>  $methods
      */
     public function __construct(
         private readonly array $methods,
         private readonly string $uri,
         private readonly string $action,
-    ) {
-    }
+    ) {}
 
     /**
      * Имя относительно зоны (дополнится префиксом: 'catalog' → 'api.v1.ext.{id}.catalog').
@@ -72,7 +71,7 @@ final class RouteDefinition
             'methods' => $this->methods,
             'action_type' => 'controller',
             'action_meta' => ['action' => $this->action],
-            'name' => $namePrefix . '.' . ($this->name ?? $this->defaultName()),
+            'name' => $namePrefix.'.'.($this->name ?? $this->defaultName()),
         ];
 
         if ($this->middleware !== []) {
@@ -88,6 +87,6 @@ final class RouteDefinition
         $normalized = (string) preg_replace('/\{([^}]+)\}/', '$1', $normalized);
         $normalized = str_replace('/', '.', $normalized);
 
-        return ($normalized === '' ? 'index' : $normalized) . '.' . strtolower(implode('-', $this->methods));
+        return ($normalized === '' ? 'index' : $normalized).'.'.strtolower(implode('-', $this->methods));
     }
 }

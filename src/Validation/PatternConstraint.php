@@ -11,18 +11,17 @@ namespace Polymorph\Sdk\Validation;
 final class PatternConstraint
 {
     /**
-     * @param string $pattern тело регулярки без разделителей
+     * @param  string  $pattern  тело регулярки без разделителей
      */
     public function __construct(
         public readonly string $pattern,
         public readonly int $max,
-    ) {
-    }
+    ) {}
 
     /** Регулярка с разделителями для preg_*. Слэши экранируются — паритет с ядром. */
     public function phpPattern(): string
     {
-        return '/' . str_replace('/', '\\/', $this->pattern) . '/';
+        return '/'.str_replace('/', '\\/', $this->pattern).'/';
     }
 
     public function matches(string $value): bool

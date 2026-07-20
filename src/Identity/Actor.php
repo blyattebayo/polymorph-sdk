@@ -14,6 +14,5 @@ final class Actor
         public readonly int $id,
         public readonly string $email,
         public readonly ?string $name = null,
-    ) {
-    }
+    ) {}
 }

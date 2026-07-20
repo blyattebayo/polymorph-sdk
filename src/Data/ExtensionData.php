@@ -14,7 +14,7 @@ namespace Polymorph\Sdk\Data;
 interface ExtensionData
 {
     /**
-     * @param class-string<Entity> $entityClass опц. сгенерированный подкласс (codegen)
+     * @param  class-string<Entity>  $entityClass  опц. сгенерированный подкласс (codegen)
      * @return Repository<Entity>
      */
     public function repository(string $entity, string $entityClass = Entity::class): Repository;

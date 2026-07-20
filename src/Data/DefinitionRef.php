@@ -15,6 +15,5 @@ final class DefinitionRef
         public readonly int $id,
         public readonly int $schemaId,
         public readonly string $entity,
-    ) {
-    }
+    ) {}
 }

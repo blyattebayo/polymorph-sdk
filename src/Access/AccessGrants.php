@@ -23,14 +23,14 @@ interface AccessGrants
      * Полностью убрать object-level доступ к ресурсам у ВСЕХ субъектов
      * (идемпотентно). Wildcard на родительский префикс не затрагивается.
      *
-     * @param list<string> $resources
+     * @param  list<string>  $resources
      */
     public function revokeResourceFromAll(array $resources, string $action = CapabilityAction::ACCESS): void;
 
     /**
      * Заменить полный набор грантов пользователя в пределах префикса.
      *
-     * @param list<string> $resources
+     * @param  list<string>  $resources
      */
     public function replaceUserGrants(int $userId, string $resourcePrefix, array $resources, string $action = CapabilityAction::ACCESS): void;
 
@@ -39,7 +39,7 @@ interface AccessGrants
     /**
      * Batch-проверка одним запросом (для списков).
      *
-     * @param list<string> $resources
+     * @param  list<string>  $resources
      * @return array<string, bool> resource => allowed
      */
     public function userCanBatch(int $userId, array $resources, string $action = CapabilityAction::ACCESS): array;

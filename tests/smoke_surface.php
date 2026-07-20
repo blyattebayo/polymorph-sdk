@@ -6,13 +6,12 @@ declare(strict_types=1);
  * Автономный smoke-тест поверхности Epic 2: routing builder, Capability,
  * validation VO, identity DTO. Запуск: php be/sdk-v2/tests/smoke_surface.php
  */
-
 spl_autoload_register(static function (string $class): void {
     $prefix = 'Polymorph\\Sdk\\';
-    if (!str_starts_with($class, $prefix)) {
+    if (! str_starts_with($class, $prefix)) {
         return;
     }
-    $path = __DIR__ . '/../src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+    $path = __DIR__.'/../src/'.str_replace('\\', '/', substr($class, strlen($prefix))).'.php';
     if (is_file($path)) {
         require $path;
     }
@@ -35,7 +34,7 @@ function check(string $name, bool $ok): void
 {
     global $failures, $count;
     $count++;
-    if (!$ok) {
+    if (! $ok) {
         $failures[] = $name;
         fwrite(STDERR, "FAIL: {$name}\n");
     }
@@ -45,8 +44,9 @@ function throws(callable $fn): bool
 {
     try {
         $fn();
+
         return false;
-    } catch (\Throwable) {
+    } catch (Throwable) {
         return true;
     }
 }
@@ -92,7 +92,7 @@ check('route capability middleware', $itemsIndex['middleware'] === ['capability.
 
 $itemsStore = $api['children'][1];
 check('default route name', $itemsStore['name'] === 'api.v1.ext.demo.items.post');
-check('no middleware key when empty', !array_key_exists('middleware', $itemsStore));
+check('no middleware key when empty', ! array_key_exists('middleware', $itemsStore));
 
 $admin = $compiled[1];
 check('admin prefix', $admin['prefix'] === 'api/v1/admin/ext/demo');
@@ -117,7 +117,7 @@ check('actor fields', $actor->id === 7 && $actor->email === 'a@b.c' && $actor->n
 
 echo "Ran {$count} checks.\n";
 if ($failures !== []) {
-    echo count($failures) . " FAILED.\n";
+    echo count($failures)." FAILED.\n";
     exit(1);
 }
 echo "All passed.\n";

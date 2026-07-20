@@ -16,8 +16,7 @@ final class SdkVersion implements Stringable
         public readonly int $major,
         public readonly int $minor,
         public readonly int $patch,
-    ) {
-    }
+    ) {}
 
     public static function fromString(string $version): self
     {

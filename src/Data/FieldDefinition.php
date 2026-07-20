@@ -14,7 +14,7 @@ namespace Polymorph\Sdk\Data;
 final class FieldDefinition
 {
     /**
-     * @param array<string, mixed> $rules валидационные правила (required/nullable/in/regex/min/max/…)
+     * @param  array<string, mixed>  $rules  валидационные правила (required/nullable/in/regex/min/max/…)
      */
     public function __construct(
         public readonly string $name,
@@ -24,8 +24,7 @@ final class FieldDefinition
         public readonly bool $unique,
         public readonly int $sortOrder,
         public readonly array $rules,
-    ) {
-    }
+    ) {}
 
     public function isRequired(): bool
     {

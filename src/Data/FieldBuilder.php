@@ -24,8 +24,7 @@ final class FieldBuilder
         private readonly string $name,
         private readonly FieldType $type,
         private Cardinality $cardinality = Cardinality::ONE,
-    ) {
-    }
+    ) {}
 
     public function required(): self
     {

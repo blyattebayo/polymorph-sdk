@@ -10,24 +10,24 @@ namespace Polymorph\Sdk\Logging;
 interface Logger
 {
     /**
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     public function info(string $event, array $context = []): void;
 
     /**
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     public function warning(string $event, array $context = []): void;
 
     /**
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     public function error(string $event, array $context = []): void;
 
     /**
      * Неизменяемое расширение контекста.
      *
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $context
      */
     public function withContext(array $context): self;
 }

@@ -21,7 +21,7 @@ use RuntimeException;
  *
  * @implements Repository<Entity>
  */
-final class InMemoryRepository implements Repository, QueryExecutor
+final class InMemoryRepository implements QueryExecutor, Repository
 {
     /** @var array<int, array{data: array<string, mixed>, revision: int, author_id: int|null}> */
     private array $rows = [];
@@ -37,8 +37,8 @@ final class InMemoryRepository implements Repository, QueryExecutor
     private readonly string $entityClass;
 
     /**
-     * @param class-string<Entity>|null $entityClass подкласс для гидрации
-     *        (см. EntityGenerator); по умолчанию базовый Entity
+     * @param  class-string<Entity>|null  $entityClass  подкласс для гидрации
+     *                                                  (см. EntityGenerator); по умолчанию базовый Entity
      */
     public function __construct(SchemaSpec $spec, ?string $entityClass = null)
     {
@@ -232,7 +232,7 @@ final class InMemoryRepository implements Repository, QueryExecutor
                 return false;
             }
             foreach ($query->conditions() as $cond) {
-                if (!$this->matches($this->fieldValue($id, $cond['field']), $cond['op'], $cond['value'])) {
+                if (! $this->matches($this->fieldValue($id, $cond['field']), $cond['op'], $cond['value'])) {
                     return false;
                 }
             }
@@ -268,8 +268,8 @@ final class InMemoryRepository implements Repository, QueryExecutor
      * (asc → id asc, desc/без order → id desc). Та же логика в sdk-testing —
      * фейк и реальный flexible-адаптер обязаны вести себя одинаково.
      *
-     * @param list<int> $ids
-     * @param list<array{field: string, dir: string}> $orders
+     * @param  list<int>  $ids
+     * @param  list<array{field: string, dir: string}>  $orders
      * @return list<int>
      */
     private function applyOrders(array $ids, array $orders): array
@@ -310,7 +310,7 @@ final class InMemoryRepository implements Repository, QueryExecutor
     }
 
     /**
-     * @param array<string, mixed> $match
+     * @param  array<string, mixed>  $match
      */
     private function matchQuery(array $match): Query
     {
@@ -327,7 +327,7 @@ final class InMemoryRepository implements Repository, QueryExecutor
      */
     private function requireRow(int $id): array
     {
-        if (!isset($this->rows[$id])) {
+        if (! isset($this->rows[$id])) {
             throw new RuntimeException("Record {$id} not found.");
         }
 
@@ -343,7 +343,7 @@ final class InMemoryRepository implements Repository, QueryExecutor
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function assertRequired(array $data): void
     {
@@ -355,12 +355,12 @@ final class InMemoryRepository implements Repository, QueryExecutor
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function assertUnique(array $data, ?int $exceptId): void
     {
         foreach ($this->fields as $field) {
-            if (!$field->unique) {
+            if (! $field->unique) {
                 continue;
             }
             $value = $data[$field->name] ?? null;
@@ -381,7 +381,7 @@ final class InMemoryRepository implements Repository, QueryExecutor
     private function assertNumericField(string $field): void
     {
         $def = $this->fields[$field] ?? null;
-        if ($def === null || !$def->type->isNumeric()) {
+        if ($def === null || ! $def->type->isNumeric()) {
             throw new \InvalidArgumentException("Field '{$field}' is not numeric.");
         }
     }

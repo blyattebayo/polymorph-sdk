@@ -14,15 +14,14 @@ namespace Polymorph\Sdk\Data;
 class Entity
 {
     /**
-     * @param array<string, mixed> $data чистые данные (без системных ключей)
+     * @param  array<string, mixed>  $data  чистые данные (без системных ключей)
      */
     public function __construct(
         public readonly int $id,
         public readonly array $data,
         public readonly int $revision,
         public readonly ?int $authorId = null,
-    ) {
-    }
+    ) {}
 
     public function get(string $key, mixed $default = null): mixed
     {

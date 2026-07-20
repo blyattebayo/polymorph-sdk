@@ -12,11 +12,10 @@ use Polymorph\Sdk\Http\Pagination;
 final class EntityPage
 {
     /**
-     * @param list<Entity> $items
+     * @param  list<Entity>  $items
      */
     public function __construct(
         public readonly array $items,
         public readonly Pagination $pagination,
-    ) {
-    }
+    ) {}
 }

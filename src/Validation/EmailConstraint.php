@@ -11,6 +11,5 @@ final class EmailConstraint
 {
     public function __construct(
         public readonly int $max,
-    ) {
-    }
+    ) {}
 }

@@ -19,7 +19,7 @@ namespace Polymorph\Sdk\Data;
 interface Repository
 {
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return T
      */
     public function create(array $data): Entity;
@@ -30,7 +30,7 @@ interface Repository
     /**
      * Безопасный partial update (мерж поверх текущих данных, атомарно).
      *
-     * @param array<string, mixed> $partial
+     * @param  array<string, mixed>  $partial
      * @return T
      */
     public function update(int $id, array $partial): Entity;
@@ -38,7 +38,7 @@ interface Repository
     /**
      * Полная замена данных (явная destructive-операция).
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return T
      */
     public function replace(int $id, array $data): Entity;
@@ -48,7 +48,6 @@ interface Repository
     /** @return list<T> */
     public function all(): array;
 
-    /** @return Query */
     public function query(): Query;
 
     /**
@@ -62,8 +61,8 @@ interface Repository
      * Найти по равенству match, иначе создать (match + defaults). Гонко-безопасно
      * при наличии unique-поля.
      *
-     * @param array<string, mixed> $match
-     * @param array<string, mixed> $defaults
+     * @param  array<string, mixed>  $match
+     * @param  array<string, mixed>  $defaults
      * @return T
      */
     public function firstOrCreate(array $match, array $defaults = []): Entity;
@@ -71,8 +70,8 @@ interface Repository
     /**
      * Создать по match или обновить существующую (мерж values).
      *
-     * @param array<string, mixed> $match
-     * @param array<string, mixed> $values
+     * @param  array<string, mixed>  $match
+     * @param  array<string, mixed>  $values
      * @return T
      */
     public function upsert(array $match, array $values = []): Entity;

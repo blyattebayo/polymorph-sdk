@@ -13,9 +13,7 @@ final class Sdk
 {
     public const VERSION = '2.1.0';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function version(): SdkVersion
     {

@@ -14,9 +14,7 @@ namespace Polymorph\Sdk\Extension;
  */
 final class ExtensionContext
 {
-    public function __construct(public readonly ExtensionId $id)
-    {
-    }
+    public function __construct(public readonly ExtensionId $id) {}
 
     public static function for(string $id): self
     {
@@ -26,7 +24,7 @@ final class ExtensionContext
     /** Префикс ACL/ресурсов расширения: 'ext.{id}.' (с завершающей точкой). */
     public function resourcePrefix(): string
     {
-        return 'ext.' . $this->id->value . '.';
+        return 'ext.'.$this->id->value.'.';
     }
 
     /**
@@ -35,12 +33,12 @@ final class ExtensionContext
      */
     public function resource(string ...$segments): string
     {
-        $base = 'ext.' . $this->id->value;
+        $base = 'ext.'.$this->id->value;
 
         if ($segments === []) {
             return $base;
         }
 
-        return $base . '.' . implode('.', array_map(static fn (string $s): string => trim($s), $segments));
+        return $base.'.'.implode('.', array_map(static fn (string $s): string => trim($s), $segments));
     }
 }

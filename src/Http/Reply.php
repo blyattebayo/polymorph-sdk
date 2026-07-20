@@ -16,14 +16,13 @@ namespace Polymorph\Sdk\Http;
 final class Reply
 {
     /**
-     * @param array<string, string> $headers
+     * @param  array<string, string>  $headers
      */
     private function __construct(
         public readonly int $status,
         public readonly mixed $body,
         public readonly array $headers = [],
-    ) {
-    }
+    ) {}
 
     public static function ok(mixed $data): self
     {
@@ -43,7 +42,7 @@ final class Reply
     /**
      * Постраничный ответ: данные + meta.pagination в едином формате ядра.
      *
-     * @param list<mixed> $items
+     * @param  list<mixed>  $items
      */
     public static function page(array $items, Pagination $pagination): self
     {

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Polymorph\Sdk\Access;
 
+use Polymorph\Sdk\Extension\ExtensionContext;
+
 /**
  * Типизированная пара (resource, action) — ЕДИНЫЙ способ требовать право в V2.
  *
  * Устраняет тройственность V1 (route->requires() vs group requires: vs ручной
  * middleware): и роуты, и группы требуют именно Capability.
  *
- * Ресурс расширения обычно строится из {@see \Polymorph\Sdk\Extension\ExtensionContext::resource()}
+ * Ресурс расширения обычно строится из {@see ExtensionContext::resource()}
  * → 'ext.{id}.…'.
  */
 final class Capability

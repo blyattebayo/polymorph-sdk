@@ -26,9 +26,7 @@ final class Query
 
     private ?int $limit = null;
 
-    public function __construct(private readonly QueryExecutor $executor)
-    {
-    }
+    public function __construct(private readonly QueryExecutor $executor) {}
 
     public function where(string $field, mixed $opOrValue, mixed $value = self::NO_VALUE): self
     {
@@ -47,7 +45,7 @@ final class Query
     }
 
     /**
-     * @param list<mixed> $values
+     * @param  list<mixed>  $values
      */
     public function whereIn(string $field, array $values): self
     {
@@ -160,7 +158,7 @@ final class Query
 
     private function assertOperator(string $op): void
     {
-        if (!in_array($op, self::OPERATORS, true)) {
+        if (! in_array($op, self::OPERATORS, true)) {
             throw new \InvalidArgumentException("Unsupported query operator '{$op}'.");
         }
     }

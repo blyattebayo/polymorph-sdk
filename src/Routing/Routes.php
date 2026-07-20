@@ -28,9 +28,7 @@ final class Routes
     /** @var list<array<string, mixed>> */
     private array $groups = [];
 
-    private function __construct(private readonly ExtensionContext $context)
-    {
-    }
+    private function __construct(private readonly ExtensionContext $context) {}
 
     public static function for(ExtensionContext $context): self
     {
@@ -40,8 +38,8 @@ final class Routes
     /**
      * Публичная API-зона: api/v1/ext/{id}. Базовый middleware: api.
      *
-     * @param Closure(RouteGroup): void $routes
-     * @param list<string> $middleware
+     * @param  Closure(RouteGroup): void  $routes
+     * @param  list<string>  $middleware
      */
     public function api(Closure $routes, array $middleware = [], ?Capability $requires = null): self
     {
@@ -53,8 +51,8 @@ final class Routes
     /**
      * Админская API-зона: api/v1/admin/ext/{id}. Базовые middleware: api, auth:api.
      *
-     * @param Closure(RouteGroup): void $routes
-     * @param list<string> $middleware
+     * @param  Closure(RouteGroup): void  $routes
+     * @param  list<string>  $middleware
      */
     public function adminApi(Closure $routes, array $middleware = [], ?Capability $requires = null): self
     {
@@ -72,8 +70,8 @@ final class Routes
     /**
      * Web-зона: ext/{id}. Базовый middleware: web.
      *
-     * @param Closure(RouteGroup): void $routes
-     * @param list<string> $middleware
+     * @param  Closure(RouteGroup): void  $routes
+     * @param  list<string>  $middleware
      */
     public function web(Closure $routes, array $middleware = [], ?Capability $requires = null): self
     {
@@ -91,8 +89,8 @@ final class Routes
     }
 
     /**
-     * @param list<string> $middleware
-     * @param Closure(RouteGroup): void $routes
+     * @param  list<string>  $middleware
+     * @param  Closure(RouteGroup): void  $routes
      */
     private function group(string $prefix, string $namePrefix, array $middleware, Closure $routes, ?Capability $requires): self
     {

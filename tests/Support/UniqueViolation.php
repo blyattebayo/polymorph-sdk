@@ -10,6 +10,4 @@ use RuntimeException;
  * Фейковый аналог нарушения UNIQUE-ограничения БД — для проверки гонко-безопасных
  * путей firstOrCreate/upsert в контракте Repository.
  */
-final class UniqueViolation extends RuntimeException
-{
-}
+final class UniqueViolation extends RuntimeException {}

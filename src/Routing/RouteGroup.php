@@ -12,13 +12,11 @@ final class RouteGroup
     /** @var list<RouteDefinition> */
     private array $routes = [];
 
-    public function __construct(private readonly string $namePrefix)
-    {
-    }
+    public function __construct(private readonly string $namePrefix) {}
 
     /**
-     * @param array{0: string, 1: string}|string $action [Controller::class, 'method'],
-     *        'Controller@method' или invokable Controller::class
+     * @param  array{0: string, 1: string}|string  $action  [Controller::class, 'method'],
+     *                                                      'Controller@method' или invokable Controller::class
      */
     public function get(string $uri, array|string $action): RouteDefinition
     {
@@ -50,8 +48,8 @@ final class RouteGroup
     }
 
     /**
-     * @param list<string> $methods
-     * @param array{0: string, 1: string}|string $action
+     * @param  list<string>  $methods
+     * @param  array{0: string, 1: string}|string  $action
      */
     public function match(array $methods, string $uri, array|string $action): RouteDefinition
     {
@@ -78,10 +76,10 @@ final class RouteGroup
     }
 
     /**
-     * @param array{0: string, 1: string}|string $action
+     * @param  array{0: string, 1: string}|string  $action
      */
     private function normalizeAction(array|string $action): string
     {
-        return is_array($action) ? $action[0] . '@' . $action[1] : $action;
+        return is_array($action) ? $action[0].'@'.$action[1] : $action;
     }
 }

@@ -20,7 +20,7 @@ use Polymorph\Sdk\Data\Repository;
 interface ExtensionServices
 {
     /**
-     * @param class-string<Entity> $entityClass опц. сгенерированный подкласс (codegen)
+     * @param  class-string<Entity>  $entityClass  опц. сгенерированный подкласс (codegen)
      * @return Repository<Entity>
      */
     public function repository(ExtensionContext $context, string $entity, string $entityClass = Entity::class): Repository;

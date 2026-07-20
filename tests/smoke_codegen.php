@@ -6,14 +6,14 @@ declare(strict_types=1);
  * Автономный smoke-тест codegen (Epic 1): SchemaSpec → типизированный класс-сущность,
  * затем гидрация через Repository. Запуск: php be/sdk-v2/tests/smoke_codegen.php
  */
-
 spl_autoload_register(static function (string $class): void {
-    foreach (['Polymorph\\Sdk\\Tests\\' => __DIR__ . '/', 'Polymorph\\Sdk\\' => __DIR__ . '/../src/'] as $prefix => $base) {
+    foreach (['Polymorph\\Sdk\\Tests\\' => __DIR__.'/', 'Polymorph\\Sdk\\' => __DIR__.'/../src/'] as $prefix => $base) {
         if (str_starts_with($class, $prefix)) {
-            $path = $base . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+            $path = $base.str_replace('\\', '/', substr($class, strlen($prefix))).'.php';
             if (is_file($path)) {
                 require $path;
             }
+
             return;
         }
     }
@@ -30,7 +30,7 @@ function check(string $name, bool $ok): void
 {
     global $failures, $count;
     $count++;
-    if (!$ok) {
+    if (! $ok) {
         $failures[] = $name;
         fwrite(STDERR, "FAIL: {$name}\n");
     }
@@ -46,7 +46,7 @@ $spec = SchemaBuilder::make('MCP Servers')
     ->build();
 
 $ns = 'Polymorph\\Sdk\\Tests\\Generated';
-$code = (new EntityGenerator())->generate($ns, 'Server', $spec);
+$code = (new EntityGenerator)->generate($ns, 'Server', $spec);
 
 // ── Сгенерированный исходник ──
 check('extends Entity', str_contains($code, 'final class Server extends Entity'));
@@ -56,15 +56,15 @@ check('bool camelCase accessor', str_contains($code, 'public function isEnabled(
 check('json array accessor', str_contains($code, 'public function args(): array'));
 check('datetime nullable accessor', str_contains($code, 'public function createdAt(): ?string'));
 check('enum field is string', str_contains($code, 'public function transport(): string'));
-check('no leftover snake method', !str_contains($code, 'is_enabled('));
+check('no leftover snake method', ! str_contains($code, 'is_enabled('));
 
 // ── Компиляция + гидрация ──
-$tmp = tempnam(sys_get_temp_dir(), 'sdk_gen_') . '.php';
+$tmp = tempnam(sys_get_temp_dir(), 'sdk_gen_').'.php';
 file_put_contents($tmp, $code);
-check('generated lints', shell_exec('php -l ' . escapeshellarg($tmp) . ' 2>&1') !== null && str_contains((string) shell_exec('php -l ' . escapeshellarg($tmp)), 'No syntax errors'));
+check('generated lints', shell_exec('php -l '.escapeshellarg($tmp).' 2>&1') !== null && str_contains((string) shell_exec('php -l '.escapeshellarg($tmp)), 'No syntax errors'));
 require $tmp;
 
-$serverClass = $ns . '\\Server';
+$serverClass = $ns.'\\Server';
 check('class loaded', class_exists($serverClass));
 
 $repo = new InMemoryRepository($spec, $serverClass);
@@ -90,7 +90,7 @@ check('query returns generated class', is_a($repo->query()->where('code', 'alpha
 
 echo "Ran {$count} checks.\n";
 if ($failures !== []) {
-    echo count($failures) . " FAILED.\n";
+    echo count($failures)." FAILED.\n";
     exit(1);
 }
 echo "All passed.\n";

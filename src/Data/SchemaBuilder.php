@@ -23,9 +23,7 @@ final class SchemaBuilder
     /** @var list<FieldBuilder> */
     private array $fields = [];
 
-    private function __construct(private readonly string $name)
-    {
-    }
+    private function __construct(private readonly string $name) {}
 
     public static function make(string $name): self
     {
@@ -33,7 +31,7 @@ final class SchemaBuilder
     }
 
     /**
-     * @param Closure(FieldBuilder): void|null $configure
+     * @param  Closure(FieldBuilder): void|null  $configure
      */
     public function field(string $name, FieldType $type, ?Closure $configure = null): self
     {
@@ -103,8 +101,8 @@ final class SchemaBuilder
     /**
      * Строковое поле с ограничением допустимых значений (rule `in`).
      *
-     * @param list<string> $values
-     * @param Closure(FieldBuilder): void|null $c
+     * @param  list<string>  $values
+     * @param  Closure(FieldBuilder): void|null  $c
      */
     public function enum(string $name, array $values, ?Closure $c = null): self
     {

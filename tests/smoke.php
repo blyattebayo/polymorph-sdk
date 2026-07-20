@@ -9,14 +9,13 @@ declare(strict_types=1);
  *
  * Pest/PHPUnit-обвязка добавится позже; здесь — быстрый guard на этапе каркаса.
  */
-
 spl_autoload_register(static function (string $class): void {
     $prefix = 'Polymorph\\Sdk\\';
-    if (!str_starts_with($class, $prefix)) {
+    if (! str_starts_with($class, $prefix)) {
         return;
     }
     $relative = substr($class, strlen($prefix));
-    $path = __DIR__ . '/../src/' . str_replace('\\', '/', $relative) . '.php';
+    $path = __DIR__.'/../src/'.str_replace('\\', '/', $relative).'.php';
     if (is_file($path)) {
         require $path;
     }
@@ -39,7 +38,7 @@ function check(string $name, bool $ok): void
 {
     global $failures, $count;
     $count++;
-    if (!$ok) {
+    if (! $ok) {
         $failures[] = $name;
         fwrite(STDERR, "FAIL: {$name}\n");
     }
@@ -49,8 +48,9 @@ function throws(callable $fn): bool
 {
     try {
         $fn();
+
         return false;
-    } catch (\Throwable) {
+    } catch (Throwable) {
         return true;
     }
 }
@@ -126,7 +126,7 @@ check('sdk version const', Sdk::VERSION === '2.0.0' && (string) Sdk::version() =
 // ── Result ──
 echo "Ran {$count} checks.\n";
 if ($failures !== []) {
-    echo count($failures) . " FAILED.\n";
+    echo count($failures)." FAILED.\n";
     exit(1);
 }
 echo "All passed.\n";

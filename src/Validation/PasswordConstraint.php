@@ -12,8 +12,7 @@ final class PasswordConstraint
     public function __construct(
         public readonly int $min,
         public readonly int $max,
-    ) {
-    }
+    ) {}
 
     public function isValidLength(string $value): bool
     {

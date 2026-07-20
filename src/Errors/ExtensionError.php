@@ -18,7 +18,7 @@ use Throwable;
 final class ExtensionError extends RuntimeException
 {
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     private function __construct(
         public readonly ErrorCode $errorCode,
@@ -30,7 +30,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function of(ErrorCode $code, ?string $detail = null, array $meta = [], ?Throwable $previous = null): self
     {
@@ -38,13 +38,13 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     /**
      * Некорректный запрос (400) — для случаев, не сводящихся к field-validation
      * (несовместимое состояние ресурса, неприменимый флоу и т.п.).
      *
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function badRequest(?string $detail = null, array $meta = []): self
     {
@@ -52,7 +52,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function notFound(?string $detail = null, array $meta = []): self
     {
@@ -60,7 +60,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, list<string>> $errors поле => список сообщений
+     * @param  array<string, list<string>>  $errors  поле => список сообщений
      */
     public static function validation(string $detail, array $errors = []): self
     {
@@ -68,7 +68,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function unauthorized(?string $detail = null, array $meta = []): self
     {
@@ -76,7 +76,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function forbidden(?string $detail = null, array $meta = []): self
     {
@@ -84,7 +84,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function conflict(?string $detail = null, array $meta = []): self
     {
@@ -92,7 +92,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function tooManyRequests(?string $detail = null, array $meta = []): self
     {
@@ -103,7 +103,7 @@ final class ExtensionError extends RuntimeException
      * Сервис временно недоступен (503) — напр. сбой/недоступность апстрима, на
      * который проксирует расширение. $previous сохраняет первопричину для логов.
      *
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function serviceUnavailable(?string $detail = null, array $meta = [], ?Throwable $previous = null): self
     {
@@ -111,7 +111,7 @@ final class ExtensionError extends RuntimeException
     }
 
     /**
-     * @param array<string, mixed> $meta
+     * @param  array<string, mixed>  $meta
      */
     public static function internal(string $detail, array $meta = [], ?Throwable $previous = null): self
     {

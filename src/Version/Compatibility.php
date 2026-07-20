@@ -23,9 +23,7 @@ final class Compatibility
     /** Сколько ПРЕДЫДУЩИХ мажоров хост поддерживает помимо текущего. */
     public const SUPPORTED_MAJOR_WINDOW = 1;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function hostSupports(
         SdkVersion $host,

@@ -11,11 +11,12 @@ namespace Polymorph\Sdk\Access;
 final class CapabilityAction
 {
     public const ACCESS = 'access';
+
     public const READ = 'read';
+
     public const WRITE = 'write';
+
     public const DELETE = 'delete';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 }

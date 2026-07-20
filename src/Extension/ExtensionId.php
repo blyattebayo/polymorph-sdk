@@ -18,9 +18,7 @@ final class ExtensionId implements Stringable
     /** Структурный slug-guard (зеркало документированного slug-правила платформы). */
     private const PATTERN = '/^[a-z][a-z0-9_-]*$/';
 
-    private function __construct(public readonly string $value)
-    {
-    }
+    private function __construct(public readonly string $value) {}
 
     public static function fromString(string $value): self
     {
@@ -28,7 +26,7 @@ final class ExtensionId implements Stringable
 
         if ($trimmed === '' || preg_match(self::PATTERN, $trimmed) !== 1) {
             throw new \InvalidArgumentException(
-                "Invalid extension id '{$value}': must match " . self::PATTERN . '.',
+                "Invalid extension id '{$value}': must match ".self::PATTERN.'.',
             );
         }
 
