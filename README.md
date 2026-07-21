@@ -1,4 +1,4 @@
-# polymorph/sdk (Extension SDK V2)
+# blyattebayo/polymorph-sdk (Extension SDK V2)
 
 Backend-SDK расширений Polymorph. **Единственная разрешённая поверхность** между
 кодом расширения и ядром (`be/app`). Прямые импорты `App\*`, `Illuminate\*`,

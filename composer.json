@@ -1,5 +1,5 @@
 {
-    "name": "polymorph/sdk",
+    "name": "blyattebayo/polymorph-sdk",
     "description": "Polymorph Extension SDK (V2): the only allowed surface between extensions and the core platform.",
     "type": "library",
     "license": "MIT",
