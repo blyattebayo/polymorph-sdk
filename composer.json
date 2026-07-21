@@ -3,7 +3,6 @@
     "description": "Polymorph Extension SDK (V2): the only allowed surface between extensions and the core platform.",
     "type": "library",
     "license": "MIT",
-    "version": "2.1.0",
     "require": {
         "php": "^8.2"
     },
