@@ -121,7 +121,10 @@ check('range previous major in window', Compatibility::satisfiesRange('2.3.0', '
 check('range future major', Compatibility::satisfiesRange('2.3.0', '^3') === false);
 check('range exact', Compatibility::satisfiesRange('2.3.0', '2.1.0') === true);
 check('range junk rejected', throws(static fn () => Compatibility::satisfiesRange('2.3.0', 'nope')));
-check('sdk version const', Sdk::VERSION === '2.0.0' && (string) Sdk::version() === '2.0.0');
+// Литерал версии здесь не проверяем: он краснел бы на каждом подъёме, ничего
+// не гарантируя. Сверка версии с тегом релиза — в smoke_version.php.
+check('sdk version const', preg_match('/^\d+\.\d+\.\d+$/', Sdk::VERSION) === 1);
+check('sdk version round-trip', (string) Sdk::version() === Sdk::VERSION);
 
 // ── Result ──
 echo "Ran {$count} checks.\n";

@@ -3,12 +3,21 @@
 declare(strict_types=1);
 
 /**
- * Version single-source guard: поле "version" в composer.json пакетов SDK должно
- * совпадать с Polymorph\Sdk\Version\Sdk::VERSION (единый источник версии контракта).
- * Рассинхрон при публикации = тихая поломка совместимости, поэтому это кандидат
- * в CI-гейт релиза SDK (ADR 0005, Фаза 5).
+ * Version single-source guard.
  *
- * Запуск: php be/sdk-v2/tests/smoke_version.php   (выход 0 = ок, 1 = провал)
+ * Версия пакета берётся из git-ТЕГА в сплит-репозитории, а не из поля "version"
+ * в composer.json (Composer прямо не рекомендует его для пакетов из VCS: оно
+ * перекрывает версию тега и расходится с ней молча). Поэтому проверяем то, что
+ * действительно может разъехаться:
+ *
+ *  - Sdk::VERSION задан и валиден;
+ *  - поля "version" в composer.json НЕТ — иначе оно перекроет тег;
+ *  - если передан тег (аргументом или CI_COMMIT_TAG / GITHUB_REF_NAME) — он
+ *    совпадает с Sdk::VERSION. Рассинхрон здесь = хост объявит одну версию
+ *    контракта, а Packagist отдаст другую, и окно совместимости расширений
+ *    поедет незаметно.
+ *
+ * Запуск: php be/sdk-v2/tests/smoke_version.php [v3.0.0]   (0 = ок, 1 = провал)
  */
 spl_autoload_register(static function (string $class): void {
     $prefix = 'Polymorph\\Sdk\\';
@@ -44,16 +53,33 @@ $composerVersion = static function (string $relFromBe): ?string {
 };
 
 $sdkVersion = Sdk::VERSION;
-$sdkComposer = $composerVersion('sdk-v2/composer.json');
-$laravelComposer = $composerVersion('sdk-laravel/composer.json');
 
-$check("Sdk::VERSION present ({$sdkVersion})", $sdkVersion !== '');
-$check('sdk-v2/composer.json version === Sdk::VERSION (got: '.($sdkComposer ?? 'null').')', $sdkComposer === $sdkVersion);
-$check('sdk-laravel/composer.json version === Sdk::VERSION (got: '.($laravelComposer ?? 'null').')', $laravelComposer === $sdkVersion);
+$check(
+    "Sdk::VERSION валиден ({$sdkVersion})",
+    preg_match('/^\d+\.\d+\.\d+$/', $sdkVersion) === 1,
+);
+
+foreach (['sdk-v2', 'sdk-laravel', 'sdk-testing', 'platform'] as $package) {
+    $pinned = $composerVersion("{$package}/composer.json");
+    $check(
+        "{$package}/composer.json не пиннит version (версия приходит из тега)".
+            ($pinned === null ? '' : " — найдено '{$pinned}'"),
+        $pinned === null,
+    );
+}
+
+$tag = $argv[1] ?? getenv('CI_COMMIT_TAG') ?: getenv('GITHUB_REF_NAME') ?: null;
+
+if (is_string($tag) && $tag !== '') {
+    $normalized = ltrim($tag, 'v');
+    $check("тег {$tag} === Sdk::VERSION {$sdkVersion}", $normalized === $sdkVersion);
+} else {
+    echo '  --  тег не передан — сверка с тегом пропущена'.PHP_EOL;
+}
 
 echo PHP_EOL;
 if ($failures === 0) {
-    echo "Ran 3 checks.\nAll passed.\n";
+    echo "All passed.\n";
     exit(0);
 }
 echo "{$failures} check(s) FAILED.\n";
