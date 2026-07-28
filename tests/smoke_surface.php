@@ -24,6 +24,7 @@ use Polymorph\Sdk\Identity\Actor;
 use Polymorph\Sdk\Routing\Middleware;
 use Polymorph\Sdk\Routing\RouteGroup;
 use Polymorph\Sdk\Routing\Routes;
+use Polymorph\Sdk\Routing\ZoneKind;
 use Polymorph\Sdk\Validation\PasswordConstraint;
 use Polymorph\Sdk\Validation\PatternConstraint;
 
@@ -58,11 +59,13 @@ check('capability action', $cap->action === 'read');
 check('capability default action', Capability::of('ext.demo.x')->action === 'access');
 check('capability empty rejected', throws(static fn () => Capability::of('', 'read')));
 check('middleware string', Middleware::requireCapability($cap) === 'capability.require:ext.demo.items,read');
-check('without csrf', Middleware::withoutCsrf() === 'without:csrf');
+check('csrf symbol', Middleware::CSRF === 'csrf');
 
 // ── Routes builder ──
+// Расширение объявляет ТОЛЬКО зону и путь внутри неё: ни id, ни префикса пути,
+// ни префикса имени здесь нет — их подставляет хост при монтировании.
 $ctx = ExtensionContext::for('demo');
-$compiled = Routes::for($ctx)
+$zones = Routes::define()
     ->api(function (RouteGroup $r) use ($ctx): void {
         $r->get('/items', ['Demo\\ItemController', 'index'])
             ->name('items.index')
@@ -70,36 +73,44 @@ $compiled = Routes::for($ctx)
         $r->post('/items', ['Demo\\ItemController', 'store']);
     })
     ->adminApi(function (RouteGroup $r): void {
-        $r->delete('/items/{item}', ['Demo\\ItemController', 'destroy'])->withoutCsrf();
+        $r->delete('/items/{item}', ['Demo\\ItemController', 'destroy'])
+            ->where('item', '[0-9]+')
+            ->withoutCsrf();
     }, requires: Capability::of('ext.demo.manage'))
-    ->toArray();
+    ->zones();
 
-check('two groups', count($compiled) === 2);
+check('two zones', count($zones) === 2);
 
-$api = $compiled[0];
-check('api group kind', $api['kind'] === 'group');
-check('api group prefix', $api['prefix'] === 'api/v1/ext/demo');
-check('api base middleware', $api['middleware'] === ['api']);
-check('api two routes', count($api['children']) === 2);
+$api = $zones[0];
+check('api zone kind', $api->kind === ZoneKind::API);
+check('api zone declares no middleware of its own', $api->middleware === []);
+check('api two routes', count($api->routes) === 2);
 
-$itemsIndex = $api['children'][0];
-check('route kind', $itemsIndex['kind'] === 'route');
-check('route uri', $itemsIndex['uri'] === '/items');
-check('route methods', $itemsIndex['methods'] === ['GET']);
-check('route action', $itemsIndex['action_meta']['action'] === 'Demo\\ItemController@index');
-check('route name with prefix', $itemsIndex['name'] === 'api.v1.ext.demo.items.index');
-check('route capability middleware', $itemsIndex['middleware'] === ['capability.require:ext.demo.items,read']);
+$itemsIndex = $api->routes[0];
+check('route uri', $itemsIndex->uri() === '/items');
+check('route methods', $itemsIndex->methods() === ['GET']);
+check('route action is a tuple', $itemsIndex->action() === ['Demo\\ItemController', 'index']);
+check('route name is relative to the zone', $itemsIndex->relativeName() === 'items.index');
+check('route capability middleware', $itemsIndex->middlewareList() === ['capability.require:ext.demo.items,read']);
 
-$itemsStore = $api['children'][1];
-check('default route name', $itemsStore['name'] === 'api.v1.ext.demo.items.post');
-check('no middleware key when empty', ! array_key_exists('middleware', $itemsStore));
+$itemsStore = $api->routes[1];
+check('unnamed route stays unnamed', $itemsStore->relativeName() === null);
+check('unnamed route has no middleware', $itemsStore->middlewareList() === []);
 
-$admin = $compiled[1];
-check('admin prefix', $admin['prefix'] === 'api/v1/admin/ext/demo');
-check('admin base middleware + capability', $admin['middleware'] === ['api', 'auth:api', 'capability.require:ext.demo.manage,access']);
-$destroy = $admin['children'][0];
-check('admin route name param stripped', $destroy['name'] === 'admin.v1.ext.demo.items.item.delete');
-check('admin route withoutCsrf', $destroy['middleware'] === ['without:csrf']);
+$admin = $zones[1];
+check('admin zone kind', $admin->kind === ZoneKind::ADMIN_API);
+check('admin zone capability', $admin->middleware === ['capability.require:ext.demo.manage,access']);
+
+$destroy = $admin->routes[0];
+check('admin route methods', $destroy->methods() === ['DELETE']);
+check('admin route where', $destroy->whereMap() === ['item' => '[0-9]+']);
+check('admin route excludes csrf separately', $destroy->withoutMiddlewareList() === ['csrf']);
+check('admin route keeps its middleware list clean', $destroy->middlewareList() === []);
+
+// Действие — только пара [контроллер, метод]: голая строка и пустой метод
+// доезжали до роутера и падали уже на запросе.
+check('empty method rejected', throws(static fn () => (new RouteGroup)->get('/x', ['Demo\\ItemController', ''])));
+check('empty controller rejected', throws(static fn () => (new RouteGroup)->get('/x', ['', 'index'])));
 
 // ── Validation VO ──
 $slug = new PatternConstraint('^[a-z][a-z0-9_-]*$', 255);
