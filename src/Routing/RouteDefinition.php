@@ -4,33 +4,57 @@ declare(strict_types=1);
 
 namespace Polymorph\Sdk\Routing;
 
+use InvalidArgumentException;
 use Polymorph\Sdk\Access\Capability;
 
 /**
  * Один маршрут расширения. Создаётся через методы {@see RouteGroup}.
+ *
+ * Действие — всегда пара [контроллер, метод], никогда голая строка: строку
+ * Laravel трактует как «Controller@method» и приписывает ей namespace
+ * родительской группы, а пустой метод после собаки доезжает до роутера
+ * и падает уже на запросе.
+ *
+ * Снимаемые middleware живут ОТДЕЛЬНЫМ списком, а не токеном 'without:x'
+ * внутри общего: два разных смысла в одном списке строк — ровно та причина,
+ * по которой снятие middleware на уровне группы молча не работало.
  */
 final class RouteDefinition
 {
-    private ?string $name = null;
-
     /** @var list<string> */
     private array $middleware = [];
 
+    /** @var list<string> */
+    private array $withoutMiddleware = [];
+
+    /** @var array<string, string> */
+    private array $where = [];
+
+    private ?string $name = null;
+
     /**
      * @param  list<string>  $methods
+     * @param  array{0: string, 1: string}  $action
      */
     public function __construct(
         private readonly array $methods,
         private readonly string $uri,
-        private readonly string $action,
+        private readonly array $action,
     ) {}
 
     /**
-     * Имя относительно зоны (дополнится префиксом: 'catalog' → 'api.v1.ext.{id}.catalog').
+     * Имя ОТНОСИТЕЛЬНО зоны: полное соберёт хост, добавив свой префикс
+     * ('catalog' → 'api.v1.ext.{id}.catalog'). Занять имя маршрута ядра нечем.
      */
     public function name(string $name): self
     {
-        $this->name = trim($name);
+        $trimmed = trim($name);
+
+        if ($trimmed === '') {
+            throw new InvalidArgumentException('Route name must not be empty.');
+        }
+
+        $this->name = $trimmed;
 
         return $this;
     }
@@ -45,48 +69,73 @@ final class RouteDefinition
     }
 
     /**
-     * ЕДИНЫЙ способ потребовать право: добавляет capability-middleware ядра.
+     * Снять middleware, applied выше по цепочке (зоной или ядром).
      */
-    public function requires(Capability $capability): self
+    public function without(string ...$middleware): self
     {
-        return $this->middleware(Middleware::requireCapability($capability));
+        foreach ($middleware as $entry) {
+            $this->withoutMiddleware[] = $entry;
+        }
+
+        return $this;
     }
 
     /** Исключить CSRF-проверку (для machine-to-machine эндпоинтов). */
     public function withoutCsrf(): self
     {
-        return $this->middleware(Middleware::withoutCsrf());
+        return $this->without(Middleware::CSRF);
     }
 
-    /**
-     * Скомпилировать в узел маршрута в формате ядра (route_nodes).
-     *
-     * @return array<string, mixed>
-     */
-    public function toNode(string $namePrefix): array
+    /** ЕДИНЫЙ способ потребовать право: добавляет capability-middleware ядра. */
+    public function requires(Capability $capability): self
     {
-        $node = [
-            'kind' => 'route',
-            'uri' => $this->uri,
-            'methods' => $this->methods,
-            'action_type' => 'controller',
-            'action_meta' => ['action' => $this->action],
-            'name' => $namePrefix.'.'.($this->name ?? $this->defaultName()),
-        ];
-
-        if ($this->middleware !== []) {
-            $node['middleware'] = $this->middleware;
-        }
-
-        return $node;
+        return $this->middleware(Middleware::requireCapability($capability));
     }
 
-    private function defaultName(): string
+    public function where(string $parameter, string $pattern): self
     {
-        $normalized = strtolower(trim($this->uri, '/'));
-        $normalized = (string) preg_replace('/\{([^}]+)\}/', '$1', $normalized);
-        $normalized = str_replace('/', '.', $normalized);
+        $this->where[$parameter] = $pattern;
 
-        return ($normalized === '' ? 'index' : $normalized).'.'.strtolower(implode('-', $this->methods));
+        return $this;
+    }
+
+    /** @return list<string> */
+    public function methods(): array
+    {
+        return $this->methods;
+    }
+
+    public function uri(): string
+    {
+        return $this->uri;
+    }
+
+    /** @return array{0: string, 1: string} */
+    public function action(): array
+    {
+        return $this->action;
+    }
+
+    public function relativeName(): ?string
+    {
+        return $this->name;
+    }
+
+    /** @return list<string> */
+    public function middlewareList(): array
+    {
+        return $this->middleware;
+    }
+
+    /** @return list<string> */
+    public function withoutMiddlewareList(): array
+    {
+        return $this->withoutMiddleware;
+    }
+
+    /** @return array<string, string> */
+    public function whereMap(): array
+    {
+        return $this->where;
     }
 }

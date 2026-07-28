@@ -6,107 +6,98 @@ namespace Polymorph\Sdk\Routing;
 
 use Closure;
 use Polymorph\Sdk\Access\Capability;
-use Polymorph\Sdk\Extension\ExtensionContext;
 
 /**
- * Типизированный builder маршрутов расширения. Компилируется в формат route_nodes
- * ядра (DB-модель маршрутов сохраняется). Зоны выводятся из {@see ExtensionContext}
- * (не зашиты в 'plugins/{id}', как в V1) — generic 'ext/{id}'.
+ * Маршруты расширения.
  *
- *     return Routes::for($context)
+ * Расширение объявляет ЗОНУ и маршруты в ней. Ни своего id, ни префикса URI,
+ * ни префикса имени оно не задаёт — их подставляет хост, который и так знает,
+ * чей файл он только что исполнил. Поэтому расширение не может ни выйти
+ * за свою поверхность, ни занять чужое имя, и отдельный класс ограничений
+ * поверхности хосту больше не нужен.
+ *
+ *     return Routes::define()
  *         ->api(function (RouteGroup $r): void {
- *             $r->get('/items', [ItemController::class, 'index'])
- *                 ->requires(Capability::of($context->resource('items'), CapabilityAction::READ));
+ *             $r->get('/items', [ItemController::class, 'index'])->name('items.index');
  *         })
  *         ->adminApi(function (RouteGroup $r): void {
- *             $r->post('/items', [ItemController::class, 'store']);
- *         }, requires: Capability::of($context->resource('items'), CapabilityAction::WRITE))
- *         ->toArray();
+ *             $r->post('/items', [ItemController::class, 'store'])->requires($manage);
+ *         });
  */
 final class Routes
 {
-    /** @var list<array<string, mixed>> */
-    private array $groups = [];
+    /** @var list<Zone> */
+    private array $zones = [];
 
-    private function __construct(private readonly ExtensionContext $context) {}
+    private function __construct() {}
 
-    public static function for(ExtensionContext $context): self
+    public static function define(): self
     {
-        return new self($context);
+        return new self;
     }
 
     /**
-     * Публичная API-зона: api/v1/ext/{id}. Базовый middleware: api.
+     * Публичная зона расширения.
      *
      * @param  Closure(RouteGroup): void  $routes
      * @param  list<string>  $middleware
+     * @param  list<string>  $without  Снимаемые middleware (см. Middleware::CSRF)
      */
-    public function api(Closure $routes, array $middleware = [], ?Capability $requires = null): self
+    public function api(Closure $routes, array $middleware = [], array $without = [], ?Capability $requires = null): self
     {
-        $id = $this->context->id->value;
-
-        return $this->group("api/v1/ext/{$id}", "api.v1.ext.{$id}", [Middleware::API, ...$middleware], $routes, $requires);
+        return $this->zone(ZoneKind::API, $routes, $middleware, $without, $requires);
     }
 
     /**
-     * Админская API-зона: api/v1/admin/ext/{id}. Базовые middleware: api, auth:api.
+     * Админская зона расширения.
      *
      * @param  Closure(RouteGroup): void  $routes
      * @param  list<string>  $middleware
+     * @param  list<string>  $without
      */
-    public function adminApi(Closure $routes, array $middleware = [], ?Capability $requires = null): self
+    public function adminApi(Closure $routes, array $middleware = [], array $without = [], ?Capability $requires = null): self
     {
-        $id = $this->context->id->value;
-
-        return $this->group(
-            "api/v1/admin/ext/{$id}",
-            "admin.v1.ext.{$id}",
-            [Middleware::API, Middleware::JWT_AUTH, ...$middleware],
-            $routes,
-            $requires,
-        );
+        return $this->zone(ZoneKind::ADMIN_API, $routes, $middleware, $without, $requires);
     }
 
     /**
-     * Web-зона: ext/{id}. Базовый middleware: web.
+     * Web-зона расширения.
      *
      * @param  Closure(RouteGroup): void  $routes
      * @param  list<string>  $middleware
+     * @param  list<string>  $without
      */
-    public function web(Closure $routes, array $middleware = [], ?Capability $requires = null): self
+    public function web(Closure $routes, array $middleware = [], array $without = [], ?Capability $requires = null): self
     {
-        $id = $this->context->id->value;
+        return $this->zone(ZoneKind::WEB, $routes, $middleware, $without, $requires);
+    }
 
-        return $this->group("ext/{$id}", "ext.{$id}", [Middleware::WEB, ...$middleware], $routes, $requires);
+    /** @return list<Zone> */
+    public function zones(): array
+    {
+        return $this->zones;
     }
 
     /**
-     * @return list<array<string, mixed>>
-     */
-    public function toArray(): array
-    {
-        return $this->groups;
-    }
-
-    /**
-     * @param  list<string>  $middleware
      * @param  Closure(RouteGroup): void  $routes
+     * @param  list<string>  $middleware
+     * @param  list<string>  $without
      */
-    private function group(string $prefix, string $namePrefix, array $middleware, Closure $routes, ?Capability $requires): self
+    private function zone(ZoneKind $kind, Closure $routes, array $middleware, array $without, ?Capability $requires): self
     {
         if ($requires !== null) {
             $middleware[] = Middleware::requireCapability($requires);
         }
 
-        $group = new RouteGroup($namePrefix);
+        $group = new RouteGroup;
         $routes($group);
 
-        $this->groups[] = [
-            'kind' => 'group',
-            'prefix' => $prefix,
-            'middleware' => $middleware,
-            'children' => $group->toNodes(),
-        ];
+        $this->zones[] = new Zone(
+            kind: $kind,
+            middleware: array_values($middleware),
+            withoutMiddleware: array_values($without),
+            routes: $group->routes(),
+        );
 
         return $this;
     }

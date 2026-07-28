@@ -4,59 +4,61 @@ declare(strict_types=1);
 
 namespace Polymorph\Sdk\Routing;
 
+use InvalidArgumentException;
+
 /**
- * Группа маршрутов внутри одной зоны (api/adminApi/web).
+ * Маршруты внутри одной зоны расширения.
  */
 final class RouteGroup
 {
     /** @var list<RouteDefinition> */
     private array $routes = [];
 
-    public function __construct(private readonly string $namePrefix) {}
-
-    /**
-     * @param  array{0: string, 1: string}|string  $action  [Controller::class, 'method'],
-     *                                                      'Controller@method' или invokable Controller::class
-     */
-    public function get(string $uri, array|string $action): RouteDefinition
+    /** @param array{0: string, 1: string} $action */
+    public function get(string $uri, array $action): RouteDefinition
     {
         return $this->match(['GET'], $uri, $action);
     }
 
-    /** @param array{0: string, 1: string}|string $action */
-    public function post(string $uri, array|string $action): RouteDefinition
+    /** @param array{0: string, 1: string} $action */
+    public function post(string $uri, array $action): RouteDefinition
     {
         return $this->match(['POST'], $uri, $action);
     }
 
-    /** @param array{0: string, 1: string}|string $action */
-    public function put(string $uri, array|string $action): RouteDefinition
+    /** @param array{0: string, 1: string} $action */
+    public function put(string $uri, array $action): RouteDefinition
     {
         return $this->match(['PUT'], $uri, $action);
     }
 
-    /** @param array{0: string, 1: string}|string $action */
-    public function patch(string $uri, array|string $action): RouteDefinition
+    /** @param array{0: string, 1: string} $action */
+    public function patch(string $uri, array $action): RouteDefinition
     {
         return $this->match(['PATCH'], $uri, $action);
     }
 
-    /** @param array{0: string, 1: string}|string $action */
-    public function delete(string $uri, array|string $action): RouteDefinition
+    /** @param array{0: string, 1: string} $action */
+    public function delete(string $uri, array $action): RouteDefinition
     {
         return $this->match(['DELETE'], $uri, $action);
     }
 
     /**
      * @param  list<string>  $methods
-     * @param  array{0: string, 1: string}|string  $action
+     * @param  array{0: string, 1: string}  $action  [Controller::class, 'method'];
+     *                                               для invokable — [Controller::class, '__invoke']
      */
-    public function match(array $methods, string $uri, array|string $action): RouteDefinition
+    public function match(array $methods, string $uri, array $action): RouteDefinition
     {
+        if ($methods === []) {
+            throw new InvalidArgumentException('Route must declare at least one HTTP method.');
+        }
+
         $route = new RouteDefinition(
-            methods: array_map(strtoupper(...), $methods),
+            methods: array_values(array_map(strtoupper(...), $methods)),
             uri: $uri,
-            action: $this->normalizeAction($action),
+            action: self::assertAction($action),
         );
 
         $this->routes[] = $route;
@@ -64,22 +66,27 @@ final class RouteGroup
         return $route;
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
-    public function toNodes(): array
+    /** @return list<RouteDefinition> */
+    public function routes(): array
     {
-        return array_map(
-            fn (RouteDefinition $route): array => $route->toNode($this->namePrefix),
-            $this->routes,
-        );
+        return $this->routes;
     }
 
     /**
-     * @param  array{0: string, 1: string}|string  $action
+     * @param  array{0: string, 1: string}  $action
+     * @return array{0: string, 1: string}
      */
-    private function normalizeAction(array|string $action): string
+    private static function assertAction(array $action): array
     {
-        return is_array($action) ? $action[0].'@'.$action[1] : $action;
+        $controller = trim($action[0] ?? '');
+        $method = trim($action[1] ?? '');
+
+        if ($controller === '' || $method === '') {
+            throw new InvalidArgumentException(
+                'Route action must be [Controller::class, \'method\']; use \'__invoke\' for invokable controllers.',
+            );
+        }
+
+        return [$controller, $method];
     }
 }

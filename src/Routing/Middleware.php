@@ -30,14 +30,4 @@ final class Middleware
     {
         return self::CAPABILITY_ALIAS.':'.$capability->resource.','.$capability->action;
     }
-
-    public static function without(string $middleware): string
-    {
-        return 'without:'.$middleware;
-    }
-
-    public static function withoutCsrf(): string
-    {
-        return self::without(self::CSRF);
-    }
 }
