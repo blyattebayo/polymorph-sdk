@@ -16,7 +16,7 @@ final class Middleware
 
     public const WEB = 'web';
 
-    public const JWT_AUTH = 'auth:api';
+    public const PAT_AUTH = 'auth:pat';
 
     /** Алиас middleware проверки capability. */
     public const CAPABILITY_ALIAS = 'capability.require';
