@@ -20,7 +20,7 @@ spl_autoload_register(static function (string $class): void {
 use Polymorph\Sdk\Access\Capability;
 use Polymorph\Sdk\Access\CapabilityAction;
 use Polymorph\Sdk\Extension\ExtensionContext;
-use Polymorph\Sdk\Identity\Actor;
+use Polymorph\Sdk\Identity\User;
 use Polymorph\Sdk\Routing\Middleware;
 use Polymorph\Sdk\Routing\RouteGroup;
 use Polymorph\Sdk\Routing\Routes;
@@ -125,8 +125,8 @@ check('password length ok', $pw->isValidLength('12345678') === true);
 check('password too short', $pw->isValidLength('1234') === false);
 
 // ── Identity DTO ──
-$actor = new Actor(7, 'a@b.c', 'Alice');
-check('actor fields', $actor->id === 7 && $actor->email === 'a@b.c' && $actor->name === 'Alice');
+$user = new User(7, 'a@b.c', 'Alice');
+check('user fields', $user->id === 7 && $user->email === 'a@b.c' && $user->name === 'Alice');
 
 echo "Ran {$count} checks.\n";
 if ($failures !== []) {
