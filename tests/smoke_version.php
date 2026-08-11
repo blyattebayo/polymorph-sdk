@@ -17,7 +17,7 @@ declare(strict_types=1);
  *    контракта, а Packagist отдаст другую, и окно совместимости расширений
  *    поедет незаметно.
  *
- * Запуск: php be/sdk-v2/tests/smoke_version.php [v3.0.0]   (0 = ок, 1 = провал)
+ * Запуск: php be/sdk-v2/tests/smoke_version.php [v4.0.0]   (0 = ок, 1 = провал)
  */
 spl_autoload_register(static function (string $class): void {
     $prefix = 'Polymorph\\Sdk\\';

@@ -59,6 +59,8 @@ check('capability action', $cap->action === 'read');
 check('capability default action', Capability::of('ext.demo.x')->action === 'access');
 check('capability empty rejected', throws(static fn () => Capability::of('', 'read')));
 check('middleware string', Middleware::requireCapability($cap) === 'capability.require:ext.demo.items,read');
+check('session middleware string', Middleware::SESSION_AUTH === 'auth:session');
+check('OAuth resource middleware string', Middleware::OAUTH_AUTH === 'oauth.resource');
 check('csrf symbol', Middleware::CSRF === 'csrf');
 
 // ── Routes builder ──

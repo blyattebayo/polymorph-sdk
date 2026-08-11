@@ -16,7 +16,9 @@ final class Middleware
 
     public const WEB = 'web';
 
-    public const PAT_AUTH = 'auth:pat';
+    public const SESSION_AUTH = 'auth:session';
+
+    public const OAUTH_AUTH = 'oauth.resource';
 
     /** Алиас middleware проверки capability. */
     public const CAPABILITY_ALIAS = 'capability.require';
