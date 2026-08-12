@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Polymorph\Sdk\Version;
 
 /**
- * Current backend extension SDK contract. The host checks each manifest's
- * `sdk` range against this version through {@see Compatibility::satisfiesRange()}.
+ * Current backend extension SDK contract. Manifests must match it exactly.
  */
 final class Sdk
 {
-    public const VERSION = '5.0.0';
+    public const VERSION = '6.0.0';
 
     private function __construct() {}
 

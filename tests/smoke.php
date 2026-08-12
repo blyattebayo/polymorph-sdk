@@ -27,7 +27,6 @@ use Polymorph\Sdk\Extension\ExtensionContext;
 use Polymorph\Sdk\Extension\ExtensionId;
 use Polymorph\Sdk\Http\Pagination;
 use Polymorph\Sdk\Http\Reply;
-use Polymorph\Sdk\Version\Compatibility;
 use Polymorph\Sdk\Version\Sdk;
 use Polymorph\Sdk\Version\SdkVersion;
 
@@ -108,18 +107,6 @@ $v = SdkVersion::fromString('2.3.1');
 check('version parse', $v->major === 2 && $v->minor === 3 && $v->patch === 1);
 check('version toString', (string) SdkVersion::fromString('2.0.0') === '2.0.0');
 check('version rejects junk', throws(static fn () => SdkVersion::fromString('nope')));
-$host = new SdkVersion(2, 3, 0);
-check('compat same major older minor required', Compatibility::hostSupports($host, new SdkVersion(2, 1, 0)) === true);
-check('compat required newer minor than host', Compatibility::hostSupports($host, new SdkVersion(2, 5, 0)) === false);
-check('compat required newer major', Compatibility::hostSupports($host, new SdkVersion(3, 0, 0)) === false);
-check('compat previous major rejected', Compatibility::hostSupports($host, new SdkVersion(1, 9, 0)) === false);
-check('compat facade strings', Compatibility::check('2.3.0', '2.0.0') === true);
-check('range caret major ok', Compatibility::satisfiesRange('2.3.0', '^2') === true);
-check('range caret minor too new', Compatibility::satisfiesRange('2.3.0', '^2.5') === false);
-check('range previous major rejected', Compatibility::satisfiesRange('2.3.0', '^1') === false);
-check('range future major', Compatibility::satisfiesRange('2.3.0', '^3') === false);
-check('range exact', Compatibility::satisfiesRange('2.3.0', '2.1.0') === true);
-check('range junk rejected', throws(static fn () => Compatibility::satisfiesRange('2.3.0', 'nope')));
 // Литерал версии здесь не проверяем: он краснел бы на каждом подъёме, ничего
 // не гарантируя. Сверка версии с тегом релиза — в smoke_version.php.
 check('sdk version const', preg_match('/^\d+\.\d+\.\d+$/', Sdk::VERSION) === 1);
