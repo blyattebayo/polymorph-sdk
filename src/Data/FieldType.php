@@ -6,7 +6,7 @@ namespace Polymorph\Sdk\Data;
 
 /**
  * Типы полей платформы данных. Зеркалят типы ядра; соответствие охраняется
- * contract-guard тестом ядра (см. ADR 0002). Замена «магическим строкам» V1
+ * contract-guard тестом ядра. Замена «магическим строкам» V1
  * (`'type' => 'string'`).
  */
 enum FieldType: string

@@ -8,7 +8,7 @@ namespace Polymorph\Sdk\Events;
  * Declared record-lifecycle contract of the Extension SDK: dispatched by the platform when an
  * extension-owned record is deleted. Extensions subscribe to THIS event (via ExtensionProvider
  * `listeners()`) instead of reaching into the platform's internal event/model classes — this is
- * the sanctioned plugin↔core boundary (ADR 0005 Фаза 4).
+ * the sanctioned plugin↔core boundary.
  *
  * `extensionId` and `entity` are the parsed components of the record's schema storage key
  * (`ext__{extensionId}__{entity}`), so a listener matches purely on its own constants without

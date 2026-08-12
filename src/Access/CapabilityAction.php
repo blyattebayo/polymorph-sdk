@@ -6,7 +6,7 @@ namespace Polymorph\Sdk\Access;
 
 /**
  * Действия capability, поддерживаемые ядром. Зеркалит capability-каталог ядра;
- * соответствие охраняется contract-guard тестом ядра (см. ADR 0002).
+ * соответствие охраняется contract-guard тестом ядра.
  */
 final class CapabilityAction
 {

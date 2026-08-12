@@ -11,7 +11,7 @@ use Polymorph\Sdk\Data\FieldType;
 use Polymorph\Sdk\Data\SchemaSpec;
 
 /**
- * EXPERIMENTAL (не подключён в сборку плагинов — см. ADR 0003, P2).
+ * EXPERIMENTAL: не подключён в сборку плагинов.
  *
  * Генерирует типизированный класс-сущность из {@see SchemaSpec}: подкласс
  * {@see Entity} с типизированными аксессорами на каждое поле.
@@ -22,8 +22,8 @@ use Polymorph\Sdk\Data\SchemaSpec;
  *     $code = (new EntityGenerator())->generate('App\\Ext\\Mcp', 'Server', $spec);
  *     // → final class Server extends Entity { public function code(): string {...} ... }
  *
- * РЕШЕНИЕ (ADR 0003): killer-фича codegen — ШАРИНГ ТИПОВ BE↔FE, а это часть Epic 4
- * (FE-codegen). BE-only codegen избыточен с принятым в плагинах паттерном «богатый
+ * Назначение codegen — ШАРИНГ ТИПОВ BE↔FE; это требует отдельного FE-codegen.
+ * BE-only codegen избыточен с принятым в плагинах паттерном «богатый
  * DTO + fromRecord(Entity)» (purr_quest так и делает). Поэтому wiring отложен до
  * Epic 4; класс держим как готовый строительный блок, но НЕ выдаём за «сделано».
  *
