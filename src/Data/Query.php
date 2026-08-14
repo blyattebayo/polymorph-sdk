@@ -14,7 +14,7 @@ final class Query
     /** Часовой для отличия where($f,$v) от where($f,$op,$v). */
     private const NO_VALUE = "\0__pq_no_value__\0";
 
-    private const OPERATORS = ['=', '!=', '<', '<=', '>', '>=', 'in'];
+    private const OPERATORS = ['=', '!=', '<', '<=', '>', '>=', 'in', 'isnull', 'notnull'];
 
     /** @var list<array{field: string, op: string, value: mixed}> */
     private array $conditions = [];
@@ -56,6 +56,7 @@ final class Query
 
     public function whereNull(string $field): self
     {
+        $this->assertOperator('isnull');
         $this->conditions[] = ['field' => $field, 'op' => 'isnull', 'value' => null];
 
         return $this;
@@ -63,6 +64,7 @@ final class Query
 
     public function whereNotNull(string $field): self
     {
+        $this->assertOperator('notnull');
         $this->conditions[] = ['field' => $field, 'op' => 'notnull', 'value' => null];
 
         return $this;
@@ -143,7 +145,11 @@ final class Query
 
     public function paginate(int $page, int $perPage): EntityPage
     {
-        return $this->executor->runPaginate($this, max(1, $page), max(1, $perPage));
+        if ($page < 1 || $perPage < 1 || $perPage > 500) {
+            throw new \InvalidArgumentException('Pagination requires page >= 1 and perPage between 1 and 500.');
+        }
+
+        return $this->executor->runPaginate($this, $page, $perPage);
     }
 
     public function sum(string $field): float

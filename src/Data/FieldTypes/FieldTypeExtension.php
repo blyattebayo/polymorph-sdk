@@ -9,6 +9,8 @@ namespace Polymorph\Sdk\Data\FieldTypes;
  *
  * Implementations return plain arrays/scalars. They cannot access platform models or
  * tables; the host validates and persists their declared projection changes.
+ * Field arguments include structural context (`parent_id`, `multi_valued`, and
+ * `position`) in addition to identity, type, cardinality, constraints, and metadata.
  */
 interface FieldTypeExtension
 {

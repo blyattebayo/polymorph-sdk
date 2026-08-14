@@ -9,7 +9,7 @@ namespace Polymorph\Sdk\Version;
  */
 final class Sdk
 {
-    public const VERSION = '6.0.0';
+    public const VERSION = '6.1.0';
 
     private function __construct() {}
 
