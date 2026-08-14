@@ -13,7 +13,7 @@ final class DefinitionRef
 {
     public function __construct(
         public readonly int $id,
-        public readonly int $schemaId,
+        public readonly string $schemaVersionId,
         public readonly string $entity,
     ) {}
 }
