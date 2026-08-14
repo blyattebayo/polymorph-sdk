@@ -41,7 +41,7 @@ $spec = SchemaBuilder::make('MCP Servers')
     ->enum('transport', ['http', 'stdio'], fn ($f) => $f->required())
     ->int('attempts')
     ->bool('is_enabled', fn ($f) => $f->nullable())
-    ->json('args', fn ($f) => $f->nullable())
+    ->rawJson('args', fn ($f) => $f->nullable())
     ->datetime('created_at')
     ->build();
 
@@ -53,7 +53,7 @@ check('extends Entity', str_contains($code, 'final class Server extends Entity')
 check('string accessor', str_contains($code, 'public function code(): string'));
 check('int accessor', str_contains($code, 'public function attempts(): int'));
 check('bool camelCase accessor', str_contains($code, 'public function isEnabled(): bool'));
-check('json array accessor', str_contains($code, 'public function args(): array'));
+check('raw json mixed accessor', str_contains($code, 'public function args(): mixed'));
 check('datetime nullable accessor', str_contains($code, 'public function createdAt(): ?string'));
 check('enum field is string', str_contains($code, 'public function transport(): string'));
 check('no leftover snake method', ! str_contains($code, 'is_enabled('));

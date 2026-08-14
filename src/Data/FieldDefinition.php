@@ -4,38 +4,35 @@ declare(strict_types=1);
 
 namespace Polymorph\Sdk\Data;
 
-/**
- * Иммутабельное определение одного поля. Результат {@see FieldBuilder}.
- *
- * Размещение признаков типобезопасно и не оставляет ловушек V1 (где 'unique'
- * случайно уходил в Laravel-валидатор): `indexed`/`unique` — отдельные поля VO,
- * `rules` — только содержательные правила валидации.
- */
-final class FieldDefinition
+/** Immutable field node in the public nested schema contract. */
+final readonly class FieldDefinition
 {
     /**
-     * @param  array<string, mixed>  $rules  валидационные правила (required/nullable/in/regex/min/max/…)
+     * @param  array<string,mixed>  $rules
+     * @param  list<FieldDefinition>  $children
      */
     public function __construct(
-        public readonly string $name,
-        public readonly FieldType $type,
-        public readonly Cardinality $cardinality,
-        public readonly bool $indexed,
-        public readonly bool $unique,
-        public readonly int $sortOrder,
-        public readonly array $rules,
-    ) {}
+        public string $name,
+        public FieldType $type,
+        public Cardinality $cardinality,
+        public bool $indexed,
+        public bool $unique,
+        public int $sortOrder,
+        public array $rules,
+        public array $children = [],
+    ) {
+        FieldName::from($name);
+        if ($type !== FieldType::JSON && $children !== []) {
+            throw new \InvalidArgumentException('Only JSON fields may declare children.');
+        }
+    }
 
     public function isRequired(): bool
     {
         return ($this->rules['required'] ?? false) === true;
     }
 
-    /**
-     * Нейтральное представление для хост-адаптера/сериализации.
-     *
-     * @return array{name: string, type: string, cardinality: string, indexed: bool, unique: bool, sort_order: int, rules: array<string, mixed>}
-     */
+    /** @return array<string,mixed> */
     public function toArray(): array
     {
         return [
@@ -46,6 +43,7 @@ final class FieldDefinition
             'unique' => $this->unique,
             'sort_order' => $this->sortOrder,
             'rules' => $this->rules,
+            'children' => array_map(static fn (self $child): array => $child->toArray(), $this->children),
         ];
     }
 }

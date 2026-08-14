@@ -57,7 +57,7 @@ $spec = SchemaBuilder::make('MCP Servers')
     ->enum('transport', ['http', 'stdio'], fn ($f) => $f->required())
     ->int('attempts')
     ->bool('is_enabled', fn ($f) => $f->nullable())
-    ->json('args', fn ($f) => $f->nullable())
+    ->rawJson('args', fn ($f) => $f->nullable())
     ->datetime('created_at')
     ->build();
 
@@ -74,6 +74,20 @@ check('attempts type int', $byName['attempts']->type === FieldType::INT);
 check('attempts default cardinality one', $byName['attempts']->cardinality === Cardinality::ONE);
 check('sort order preserved', $byName['code']->sortOrder === 0 && $byName['created_at']->sortOrder === 5);
 check('empty schema rejected', throws(static fn () => SchemaBuilder::make('X')->build()));
+check('dotted field name rejected', throws(static fn () => SchemaBuilder::make('X')->string('profile.city')));
+check('non-canonical field names rejected', throws(static fn () => SchemaBuilder::make('X')->string('_private'))
+    && throws(static fn () => SchemaBuilder::make('X')->string('Upper'))
+    && throws(static fn () => SchemaBuilder::make('X')->string(str_repeat('a', 256))));
+
+$nested = SchemaBuilder::make('Nested')
+    ->object('profile', fn ($object) => $object
+        ->string('city')
+        ->objects('addresses', fn ($address) => $address->string('line')))
+    ->build();
+$profile = $nested->fields[0];
+check('typed object DSL emits JSON one', $profile->type === FieldType::JSON && $profile->cardinality === Cardinality::ONE);
+check('typed object DSL retains nested children', $profile->children[0]->name === 'city' && $profile->children[1]->name === 'addresses');
+check('typed objects DSL emits JSON many', $profile->children[1]->type === FieldType::JSON && $profile->children[1]->cardinality === Cardinality::MANY);
 
 // ── Repository contract (in-memory fake) ──
 function freshRepo($spec): InMemoryRepository

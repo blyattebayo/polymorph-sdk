@@ -88,6 +88,7 @@ final class EntityGenerator
             FieldType::BOOL => 'bool',
             FieldType::DATETIME => '?string',
             FieldType::JSON => 'array',
+            FieldType::RAW_JSON => 'mixed',
         };
     }
 
@@ -106,6 +107,7 @@ final class EntityGenerator
             FieldType::BOOL => "\$this->bool('{$name}')",
             FieldType::DATETIME => "\$this->datetime('{$name}')",
             FieldType::JSON => "\$this->array('{$name}')",
+            FieldType::RAW_JSON => "\$this->get('{$name}')",
         };
     }
 

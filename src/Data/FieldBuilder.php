@@ -20,11 +20,17 @@ final class FieldBuilder
     /** @var array<string, mixed> */
     private array $rules = [];
 
+    private readonly string $name;
+
     public function __construct(
-        private readonly string $name,
+        string $name,
         private readonly FieldType $type,
         private Cardinality $cardinality = Cardinality::ONE,
-    ) {}
+        /** @var list<FieldDefinition> */
+        private readonly array $children = [],
+    ) {
+        $this->name = FieldName::from($name)->value;
+    }
 
     public function required(): self
     {
@@ -90,6 +96,7 @@ final class FieldBuilder
             unique: $this->unique,
             sortOrder: $this->sortOrder ?? $defaultSortOrder,
             rules: $this->rules,
+            children: $this->children,
         );
     }
 }
